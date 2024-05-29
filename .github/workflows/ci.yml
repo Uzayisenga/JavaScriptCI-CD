@@ -39,8 +39,10 @@ jobs:
 
       - name: List node_modules/.bin directory
         run: ls -la node_modules/.bin
-        
+      - name: Ensure npx is available
+        run: which npm 
       - name: Run tests
+        shell: bash
         env:
           PATH: /usr/local/bin:$PATH
-        run: npx cucumber-js features/uploadFile.feature
+        run: npm run test features/uploadFile.feature
