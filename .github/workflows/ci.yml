@@ -44,9 +44,8 @@ jobs:
 
       - name: Ensure npx is available
         run: which npx
-
       - name: Run tests
         shell: bash
         env:
           PATH: /usr/local/bin:$PATH
-        run: /usr/local/bin/npx cucumber-js features/uploadFile.feature
+        run: /usr/local/bin/npx cucumber-js features/uploadFile.feature 
