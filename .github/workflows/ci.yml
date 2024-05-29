@@ -20,6 +20,8 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        run: npm cache clean --force
+        run: npm start
 
       - name: Grant execute permissions to cucumber-js
         run: chmod +x ./node_modules/.bin/cucumber-js
