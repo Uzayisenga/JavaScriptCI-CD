@@ -20,8 +20,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      - name: Grant execute permissions to cucumber-js
-        run: chmod +x ./node_modules/.bin/cucumber-js
 
       - name: Install Chrome browser
         run: |
@@ -34,15 +32,16 @@ jobs:
           curl -sS -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
           sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
+
       - name: List project directory
         run: ls -la
 
       - name: List node_modules/.bin directory
         run: ls -la node_modules/.bin
+
       - name: Ensure npx is available
-        run: which npx 
+        run: which npx
+
       - name: Run tests
         shell: bash
-        env:
-          PATH: /usr/local/bin:$PATH
-        run: npx run test features/uploadFile.feature
+        run: npx cucumber-js features/uploadFile.feature
