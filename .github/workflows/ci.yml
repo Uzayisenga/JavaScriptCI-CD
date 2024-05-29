@@ -34,7 +34,12 @@ jobs:
           curl -sS -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip
           sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
+      - name: List project directory
+        run: ls -la
 
+      - name: List node_modules/.bin directory
+        run: ls -la node_modules/.bin
+        
       - name: Run tests
         env:
           PATH: /usr/local/bin:$PATH
