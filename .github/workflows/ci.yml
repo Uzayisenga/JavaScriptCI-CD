@@ -33,7 +33,7 @@ jobs:
           sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
    
-    - name: Grant execute permissions to cucumber-js
+       - name: Grant execute permissions to cucumber-js
         run: chmod +x ./node_modules/.bin/cucumber-js
       - name: Run tests
         env:
