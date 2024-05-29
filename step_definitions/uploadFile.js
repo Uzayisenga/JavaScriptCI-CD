@@ -7,7 +7,7 @@ let driver = new Builder()
     .setChromeOptions(new chrome.Options())
     .build();
 
-const { until, By, Builder } = require('selenium-webdriver');
+//const { until, By, Builder } = require('selenium-webdriver');
 const { When, Then, setDefaultTimeout } = require('@cucumber/cucumber');
 const RegisterPage = require('../PageObjects/RegisterPage');
 const assert = require('assert');
