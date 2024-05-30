@@ -1,13 +1,18 @@
-// const { Builder } = require('selenium-webdriver');
+//const { Builder } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 //const path = require('path');
 
-// Set the path to the ChromeDriver
-const service = new chrome.ServiceBuilder('/usr/local/bin/chromedriver').build();
-chrome.setDefaultService(service);
-
 (async function example() {
-  let driver = await new Builder().forBrowser('chrome').build();
+  // Path to the ChromeDriver
+  const service = new chrome.ServiceBuilder('/usr/local/bin/chromedriver').build();
+
+  let options = new chrome.Options();
+  let driver = new Builder()
+      .forBrowser('chrome')
+      .setChromeOptions(options)
+      .setChromeService(service)
+      .build();
+  
   try {
     // Your test code here
   } finally {
