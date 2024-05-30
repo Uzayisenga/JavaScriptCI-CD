@@ -56,5 +56,25 @@ jobs:
       - name: Grant execute permissions to cucumber-js
         run: chmod +x ./node_modules/.bin/cucumber-js
 
+      - name: Install Chrome browser
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          google-chrome --version
+
+      - name: Install ChromeDriver
+        run: |
+          sudo apt-get install -yqq unzip
+          CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          curl -sS -o /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip"
+          sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
+          sudo chmod +x /usr/local/bin/chromedriver
+          chromedriver --version
+
+      - name: Ensure chromedriver is in the PATH
+        run: |
+          echo $PATH
+          which chromedriver
+
       - name: Run tests
         run: ./node_modules/.bin/cucumber-js features/uploadFile.feature
