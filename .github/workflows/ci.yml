@@ -21,38 +21,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Verify Node.js and npm installation
-        run: |
-          node -v
-          npm -v
-
-      - name: List project directory
-        run: ls -la
-
-      - name: List node_modules directory
-        run: ls -la node_modules
-
-      - name: Check if features directory exists
-        run: |
-          if [ ! -d "features" ]; then
-            echo "features directory does not exist"
-            exit 1
-          fi
-
-      - name: Check if features/uploadFile.feature exists
-        run: |
-          if [ ! -f "features/uploadFile.feature" ]; then
-            echo "features/uploadFile.feature does not exist"
-            exit 1
-          fi
-
-      - name: Check if cucumber-js is installed
-        run: |
-          if [ ! -f "node_modules/.bin/cucumber-js" ]; then
-            echo "cucumber-js does not exist in node_modules/.bin"
-            exit 1
-          fi
-
       - name: Grant execute permissions to cucumber-js
         run: chmod +x ./node_modules/.bin/cucumber-js
 
@@ -75,6 +43,23 @@ jobs:
         run: |
           echo $PATH
           which chromedriver
+
+      - name: Ensure Google Chrome is in the PATH
+        run: which google-chrome
+
+      - name: Print Chrome and ChromeDriver versions
+        run: |
+          google-chrome --version
+          chromedriver --version
+
+      - name: List project directory
+        run: ls -la
+
+      - name: List node_modules/.bin directory
+        run: ls -la node_modules/.bin
+
+      - name: Ensure npx is available
+        run: which npx
 
       - name: Run tests
         run: ./node_modules/.bin/cucumber-js features/uploadFile.feature
