@@ -1,6 +1,6 @@
 // const { Builder } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const path = require('path');
+//const path = require('path');
 
 // Set the path to the ChromeDriver
 const service = new chrome.ServiceBuilder('/usr/local/bin/chromedriver').build();
