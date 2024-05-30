@@ -12,12 +12,8 @@ const chrome = require('selenium-webdriver/chrome');
       .setChromeService(service)
       .build();
   
-  try {
-    // Your test code here
-  } finally {
-    await driver.quit();
-  }
-})();
+  
+
 
 const { until, By, Builder } = require('selenium-webdriver');
 const { When, Then, setDefaultTimeout } = require('@cucumber/cucumber');
@@ -28,7 +24,7 @@ const path = require('path');
 // Set default timeout to 60 seconds
 setDefaultTimeout(60 * 1000);
 
-let driver; 
+//let driver; 
 let registerPage;
 
 When('a user clicks on selenium link', async function () {
@@ -104,5 +100,5 @@ Then('the user should receive {string} message', async function (expectedMessage
         await driver.quit();
     }
 });
-
+})();
 
