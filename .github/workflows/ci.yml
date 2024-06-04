@@ -29,10 +29,40 @@ jobs:
         run: chmod +x ./node_modules/.bin/cucumber-js
 
       - name: Install browser driver (Firefox in this example)
-        run: |
-         echo 'deb https://apt.mozilla.org/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/geckodriver.list
-         sudo apt update
-         sudo apt install -y firefox geckodriver
+        steps:
+        - name: Add GeckoDriver repository (attempt 1)
+          run: |
+              echo 'deb https://apt.mozilla.org/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/geckodriver.list
+        - name: Update package list (attempt 1)
+          run: sudo apt update
+        - name: Check for update success (attempt 1)
+          run: |
+              if [[ $? -eq 0 ]]; then
+                echo "Package list update successful."
+              else
+                echo "Package list update failed. Retrying..."
+                exit 1
+              fi
+        - uses: actions/github-script@v6
+          with:
+              script: |
+                if [[ github.event.run_number == 1 ]]; then
+                  core.setOutput('retry', true)
+                else
+                  core.setOutput('retry', false)
+                endfi
+        - name: Retry workflow if update fails (optional)
+          uses: potiuk/retry@v2
+          with:
+              timeout_minutes: 5  # Adjust timeout as needed
+              retry_if: ${{ steps.check-for-update-success.outputs.retry }}
+        - name: Update package list (alternative - if retry fails)
+          if: ${{ steps.check-for-update-success.outputs.retry }}
+          run: |
+              curl -fsSL https://apt.mozilla.org/ubuntu/dists/jammy/Release | sudo tee /etc/apt/sources.list.d/geckodriver.list
+        - name: Install GeckoDriver (after successful update)
+          run: sudo apt install -y firefox geckodriver
+
 
 
       - name: Run tests
