@@ -1,4 +1,4 @@
-name: full-quality-assurance
+name: CI
 
 on:
   pull_request:
