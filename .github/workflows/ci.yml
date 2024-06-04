@@ -35,7 +35,7 @@ jobs:
 
       - name: Run tests
         run: ./node_modules/.bin/cucumber-js features/uploadFile.feature
-        run: npm test
+        
 
   lint:
     name: Lint code
