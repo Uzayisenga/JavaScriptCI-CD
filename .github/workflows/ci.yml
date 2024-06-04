@@ -30,8 +30,10 @@ jobs:
 
       - name: Install browser driver (Firefox in this example)
         run: |
-          sudo apt update
-          sudo apt install -y firefox geckodriver
+         echo 'deb https://apt.mozilla.org/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/geckodriver.list
+         sudo apt update
+         sudo apt install -y firefox geckodriver
+
 
       - name: Run tests
         run: ./node_modules/.bin/cucumber-js features/uploadFile.feature
