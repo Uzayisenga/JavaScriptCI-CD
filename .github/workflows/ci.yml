@@ -1,9 +1,13 @@
 name: CI
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+      - master
+  push:
+    branches:
+      - master
 
 jobs:
   test:
@@ -21,45 +25,94 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Grant execute permissions to cucumber-js
+      - name: Grant execute permissions to cucumber-js (optional)
         run: chmod +x ./node_modules/.bin/cucumber-js
 
-      - name: Install Chrome browser
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
-          google-chrome --version
+      - name: Install browser driver (Firefox in this example)
+        steps:
+          - name: Add GeckoDriver repository (attempt 1)
+            run: |
+              echo 'deb https://apt.mozilla.org/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/geckodriver.list
+          - name: Update package list (attempt 1)
+            run: sudo apt update
+          - name: Check for update success (attempt 1)
+            run: |
+              if [[ $? -eq 0 ]]; then
+                echo "Package list update successful."
+              else
+                echo "Package list update failed. Retrying..."
+                exit 1
+              fi
+          - uses: actions/github-script@v6
+            with:
+              script: |
+                if [[ github.event.run_number == 1 ]]; then
+                  core.setOutput('retry', true)
+                else
+                  core.setOutput('retry', false)
+                endfi
+          - name: Retry workflow if update fails (optional)
+            uses: potiuk/retry@v2
+            with:
+              timeout_minutes: 5  # Adjust timeout as needed
+              retry_if: ${{ steps.check-for-update-success.outputs.retry }}
+          - name: Update package list (alternative - if retry fails)
+            if: ${{ steps.check-for-update-success.outputs.retry }}
+            run: |
+              curl -fsSL https://apt.mozilla.org/ubuntu/dists/jammy/Release | sudo tee /etc/apt/sources.list.d/geckodriver.list
+          - name: Install GeckoDriver (after successful update)
+            run: sudo apt install -y firefox geckodriver
 
-      - name: Install ChromeDriver
-        run: |
-          sudo apt-get install -yqq unzip
-          CHROME_DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)
-          curl -sS -o /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip"
-          sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
-          sudo chmod +x /usr/local/bin/chromedriver
-          chromedriver --version
 
-      - name: Ensure chromedriver is in the PATH
-        run: |
-          echo $PATH
-          which chromedriver
-
-      - name: Ensure Google Chrome is in the PATH
-        run: which google-chrome
-
-      - name: Print Chrome and ChromeDriver versions
-        run: |
-          google-chrome --version
-          chromedriver --version
-
-      - name: List project directory
-        run: ls -la
-
-      - name: List node_modules/.bin directory
-        run: ls -la node_modules/.bin
-
-      - name: Ensure npx is available
-        run: which npx
 
       - name: Run tests
         run: ./node_modules/.bin/cucumber-js features/uploadFile.feature
+        
+
+  lint:
+    name: Lint code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up node.js
+        uses: actions/setup-node@v2
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Run linting
+        run: npm run lint
+
+  license:
+    name: Check license conformity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up node.js
+        uses: actions/setup-node@v2
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Run license check
+        run: npm run license
+
+  generate-docs:
+    name: Generate documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Build packages
+        run: npm run build
+      - name: Generate docs
+        run: npm run docs
+      - name: Upload docs
+        uses: actions/upload-artifact@v2
+        with:
+          name: dvelop-sdk-${{github.run_id}}-docs
+          path: docs
