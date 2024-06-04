@@ -1,3 +1,14 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - master
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,3 +35,52 @@ jobs:
 
       - name: Run tests
         run: ./node_modules/.bin/cucumber-js features/uploadFile.feature
+        run: npm test
+
+  lint:
+    name: Lint code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up node.js
+        uses: actions/setup-node@v2
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Run linting
+        run: npm run lint
+
+  license:
+    name: Check license conformity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up node.js
+        uses: actions/setup-node@v2
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Run license check
+        run: npm run license
+
+  generate-docs:
+    name: Generate documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install npm dependencies
+        run: npm ci
+      - name: Build packages
+        run: npm run build
+      - name: Generate docs
+        run: npm run docs
+      - name: Upload docs
+        uses: actions/upload-artifact@v2
+        with:
+          name: dvelop-sdk-${{github.run_id}}-docs
+          path: docs
